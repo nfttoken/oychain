@@ -8,7 +8,7 @@
 //
 // The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FI TNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
@@ -52,7 +52,7 @@ const (
 	inmemorySignatures = 4096 // Number of recent block signatures to keep in memory
 
 	wiggleTime    = 500 * time.Millisecond // Random delay (per validator) to allow concurrent validators
-	maxValidators = 21                     // Max validators allowed to seal.
+	maxValidators = 29                     // Max validators allowed to seal.
 )
 
 // proof-of-stake-authority protocol constants.
@@ -565,6 +565,14 @@ func (c *POSA) Finalize(chain consensus.ChainHeaderReader, header *types.Header,
 		}
 	}
 
+	// In Ishikari Patch 001, We have fixed some minor bugs found on testnets.
+	if c.chainConfig.IsIshikariPatch001HardforkBlock(header.Number) {
+		for _, p := range getIshikariPatch001() {
+			// apply each patch
+			p(state)
+		}
+	}
+
 	if header.Difficulty.Cmp(diffInTurn) != 0 {
 		if err := c.tryPunishValidator(chain, header, state); err != nil {
 			return err
@@ -620,6 +628,15 @@ func (c *POSA) FinalizeAndAssemble(chain consensus.ChainHeaderReader, header *ty
 			panic(err)
 		}
 	}
+
+	// In Ishikari Patch 001, We have fixed some minor bugs found on testnets.
+	if c.chainConfig.IsIshikariPatch001HardforkBlock(header.Number) {
+		for _, p := range getIshikariPatch001() {
+			// apply each patch
+			p(state)
+		}
+	}
+
 	// punish validator if necessary
 	if header.Difficulty.Cmp(diffInTurn) != 0 {
 		if err := c.tryPunishValidator(chain, header, state); err != nil {
