@@ -61,6 +61,7 @@ var (
 		// @cary the block when hardfork happens.
 		IshikariBlock:         nil,
 		IshikariPatch001Block: nil,
+		IshikariPatch002Block: nil,
 		POSA: &POSAConfig{
 			Period:                    3,
 			Epoch:                     100,
@@ -92,6 +93,8 @@ var (
 		IshikariBlock: big.NewInt(11321699),
 		// Ishikari patch 001
 		IshikariPatch001Block: big.NewInt(12153317),
+		// Ishikari patch 002
+		IshikariPatch002Block: big.NewInt(12162886),
 
 		// Ishikari patch001
 		// Fix minor bugs found in testnet
@@ -120,16 +123,16 @@ var (
 	//
 	// This configuration is intentionally not using keyed fields to force anyone
 	// adding flags to the config to also have to set these fields.
-	AllEthashProtocolChanges = &ChainConfig{big.NewInt(1337), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, nil, nil, new(EthashConfig), nil, nil}
+	AllEthashProtocolChanges = &ChainConfig{big.NewInt(1337), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, nil, nil, nil, new(EthashConfig), nil, nil}
 
 	// AllCliqueProtocolChanges contains every protocol change (EIPs) introduced
 	// and accepted by the Ethereum core developers into the Clique consensus.
 	//
 	// This configuration is intentionally not using keyed fields to force anyone
 	// adding flags to the config to also have to set these fields.
-	AllCliqueProtocolChanges = &ChainConfig{big.NewInt(1337), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, nil, nil, nil, &CliqueConfig{Period: 0, Epoch: 30000}, nil}
+	AllCliqueProtocolChanges = &ChainConfig{big.NewInt(1337), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, nil, nil, nil, nil, &CliqueConfig{Period: 0, Epoch: 30000}, nil}
 
-	TestChainConfig = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, nil, nil, new(EthashConfig), nil, nil}
+	TestChainConfig = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, nil, nil, nil, new(EthashConfig), nil, nil}
 )
 
 // TrustedCheckpoint represents a set of post-processed trie roots (CHT and
@@ -214,6 +217,10 @@ type ChainConfig struct {
 	// A patch for Ishikari hardfork
 	// Fix minor bugs found on testnet
 	IshikariPatch001Block *big.Int `json:"ishikariPatch001Block,omitempty"`
+
+	// A patch for Ishikari hardfork
+	// The punishment parameters for mainnet is determined in this hardfork
+	IshikariPatch002Block *big.Int `json:"ishikariPatch002Block,omitempty"`
 
 	YoloV3Block *big.Int `json:"yoloV3Block,omitempty"` // YOLO v3: Gas repricings TODO @holiman add EIP references
 	EWASMBlock  *big.Int `json:"ewasmBlock,omitempty"`  // EWASM switch block (nil = no fork, 0 = already activated)
@@ -416,6 +423,14 @@ func (c *ChainConfig) IsIshikariPatch001HardforkBlock(num *big.Int) bool {
 	return num.Cmp(c.IshikariPatch001Block) == 0
 }
 
+// is the block number "num" when IshikariPatch002 hardfork happens ?
+func (c *ChainConfig) IsIshikariPatch002HardforkBlock(num *big.Int) bool {
+	if num == nil || c.IshikariPatch002Block == nil {
+		return false
+	}
+	return num.Cmp(c.IshikariPatch002Block) == 0
+}
+
 // CheckCompatible checks whether scheduled fork transitions have been imported
 // with a mismatching chain configuration.
 func (c *ChainConfig) CheckCompatible(newcfg *ChainConfig, height uint64) *ConfigCompatError {
@@ -456,6 +471,8 @@ func (c *ChainConfig) CheckConfigForkOrder() error {
 		{name: "muirGlacierBlock", block: c.MuirGlacierBlock, optional: true},
 		{name: "berlinBlock", block: c.BerlinBlock},
 		{name: "ishikariBlock", block: c.IshikariBlock},
+		{name: "ishikariPatch001Block", block: c.IshikariPatch001Block},
+		{name: "ishikariPatch002Block", block: c.IshikariPatch002Block},
 	} {
 		if lastFork.name != "" {
 			// Next one must be higher number
@@ -531,6 +548,14 @@ func (c *ChainConfig) checkCompatible(newcfg *ChainConfig, head *big.Int) *Confi
 
 	if isForkIncompatible(c.IshikariBlock, newcfg.IshikariBlock, head) {
 		return newCompatError("Ishikari fork block", c.IshikariBlock, newcfg.IshikariBlock)
+	}
+
+	if isForkIncompatible(c.IshikariPatch001Block, newcfg.IshikariPatch001Block, head) {
+		return newCompatError("IshikariPatch001 fork block", c.IshikariPatch001Block, newcfg.IshikariPatch001Block)
+	}
+
+	if isForkIncompatible(c.IshikariPatch002Block, newcfg.IshikariPatch002Block, head) {
+		return newCompatError("IshikariPatch002 fork block", c.IshikariPatch002Block, newcfg.IshikariPatch002Block)
 	}
 	return nil
 }
