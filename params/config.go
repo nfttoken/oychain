@@ -94,7 +94,7 @@ var (
 		// Ishikari patch 001
 		IshikariPatch001Block: big.NewInt(12153317),
 		// Ishikari patch 002
-		IshikariPatch002Block: nil,
+		IshikariPatch002Block: big.NewInt(12162886),
 
 		// Ishikari patch001
 		// Fix minor bugs found in testnet
