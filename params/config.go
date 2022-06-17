@@ -59,15 +59,46 @@ var (
 		BerlinBlock:         big.NewInt(0),
 		CVE_2021_39137Block: big.NewInt(2509228), // see more in: core/vm/instructions_kcc_issue_9.go
 		// @cary the block when hardfork happens.
-		IshikariBlock:         nil,
-		IshikariPatch001Block: nil,
-		IshikariPatch002Block: nil,
+		IshikariBlock:         big.NewInt(11171299),
+		IshikariPatch001Block: big.NewInt(11171299),
+		IshikariPatch002Block: big.NewInt(11171299),
 		POSA: &POSAConfig{
 			Period:                    3,
 			Epoch:                     100,
-			IshikariInitialValidators: []common.Address{}, // @cary @Junm TODO: Ishikari initial validators
-			IshikariInitialManagers:   []common.Address{},
-			IshikariAdminMultiSig:     common.Address{},
+			IshikariInitialValidators: []common.Address{
+				common.HexToAddress("0x1105c97ffbd985600e6dc8e06e477b99d0a9ff39"),
+				common.HexToAddress("0xeac6d9b96c73a637ba9d7a54dc4faece0300fcb3"),
+				common.HexToAddress("0x98a96f0db2185a9462c0cedd1a6259955fff7353"),
+
+				common.HexToAddress("0x429663140a87d0ee4ac6b6d3cf8a538b46d18e49"),
+				common.HexToAddress("0x6ee29fbbe3e0bdbf86773d71ebc6b5e38ce81e2e"),
+				common.HexToAddress("0x87fcfadc3af29ab3197c81ec247c0b28f465fafe"),
+
+				common.HexToAddress("0x43e3adc88f337e0596b47d4c1794294b99226e5f"),
+				common.HexToAddress("0xe270d4fce42c7713f1ad9cc75d41b7a69558a169"),
+				common.HexToAddress("0xbe5f2ffcbd26fc5304721de0c7279960c453b8f0"),
+
+				common.HexToAddress("0x9d4a6f12d16c7950ff58ab7ea26cdd837697db6f"),
+				common.HexToAddress("0xad291383864e1999fc7a36120562f1bb59dfea99"),
+			}, // @cary @Junm TODO: Ishikari initial validators
+
+			IshikariInitialManagers:   []common.Address{
+				common.HexToAddress("0x65E958D3EA7e60F33098dc665B0C8B7Dc563FA72"),
+				common.HexToAddress("0x6586e16EB5574f79bA4Cfa46C3b37bAEAAC50f32"),
+				common.HexToAddress("0xCCbb95B446e7CFd23fb80374b92d1F6F33e073E2"),
+
+				common.HexToAddress("0x20fefFC0f3182Ec1F7507624Fe643a5B853Cb04D"),
+				common.HexToAddress("0x55396D01b6383f7A576460fb33ef29ced3A744f8"),
+				common.HexToAddress("0x914b49DBC9BDd151Cf3b76f7E19963b61e90DbEC"),
+
+				common.HexToAddress("0x0Bcc6F86f105679881456699E91389fBd07e4cC3"),
+				common.HexToAddress("0xD2081060FB57bF06668195979C6c200d31f7cb4B"),
+				common.HexToAddress("0xC2fCf0C527E0642b14778876d57b8a6f582d25f5"),
+
+				common.HexToAddress("0xb9D71eF2D3A31588EF9196e66d69EE20B7302af8"),
+				common.HexToAddress("0x68A6a68d03D405af7E4676e5D92AD4BD7d1d004a"),
+			},
+			IshikariAdminMultiSig:     common.HexToAddress("0xD4139cc315164d4dcC696a18902F2e6b7B5D3de8"),
 		},
 	}
 
