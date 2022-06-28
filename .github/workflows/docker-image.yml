@@ -3,10 +3,6 @@ name: Docker Image CI
 on:
   workflow_dispatch:
 
-  push:
-    -tags:
-      - v1.2.0
-
 
 jobs:
 
