@@ -668,6 +668,11 @@ var (
 		Usage: "Maximum gas price will be recommended by gpo",
 		Value: ethconfig.Defaults.GPO.MaxPrice.Int64(),
 	}
+	GpoMinGasPriceFlag = cli.Int64Flag{
+		Name:  "gpo.minprice",
+		Usage: "Minimum gas price will be recommended by gpo",
+		Value: ethconfig.Defaults.GPO.MinPrice.Int64(),
+	}
 
 	// Metrics flags
 	MetricsEnabledFlag = cli.BoolFlag{
@@ -1237,6 +1242,9 @@ func setGPO(ctx *cli.Context, cfg *gasprice.Config, light bool) {
 	}
 	if ctx.GlobalIsSet(GpoMaxGasPriceFlag.Name) {
 		cfg.MaxPrice = big.NewInt(ctx.GlobalInt64(GpoMaxGasPriceFlag.Name))
+	}
+	if ctx.GlobalIsSet(GpoMinGasPriceFlag.Name) {
+		cfg.MinPrice = big.NewInt(ctx.GlobalInt64(GpoMinGasPriceFlag.Name))
 	}
 }
 

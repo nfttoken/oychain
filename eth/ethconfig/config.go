@@ -46,6 +46,7 @@ var FullNodeGPO = gasprice.Config{
 	Blocks:     20,
 	Percentile: 60,
 	MaxPrice:   gasprice.DefaultMaxPrice,
+	MinPrice:   gasprice.DefaultMinPrice,
 }
 
 // LightClientGPO contains default gasprice oracle settings for light client.
@@ -53,6 +54,7 @@ var LightClientGPO = gasprice.Config{
 	Blocks:     2,
 	Percentile: 60,
 	MaxPrice:   gasprice.DefaultMaxPrice,
+	MinPrice:   gasprice.DefaultMinPrice,
 }
 
 // Defaults contains default settings for use on the Ethereum main net.
