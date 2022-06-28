@@ -32,12 +32,14 @@ import (
 const sampleNumber = 3 // Number of transactions sampled in a block
 
 var DefaultMaxPrice = big.NewInt(500 * params.GWei)
+var DefaultMinPrice = big.NewInt(3 * params.GWei)
 
 type Config struct {
 	Blocks     int
 	Percentile int
 	Default    *big.Int `toml:",omitempty"`
 	MaxPrice   *big.Int `toml:",omitempty"`
+	MinPrice   *big.Int `toml:",omitempty"`
 }
 
 // OracleBackend includes all necessary background APIs for oracle.
@@ -54,6 +56,7 @@ type Oracle struct {
 	lastHead  common.Hash
 	lastPrice *big.Int
 	maxPrice  *big.Int
+	minPrice  *big.Int
 	cacheLock sync.RWMutex
 	fetchLock sync.Mutex
 
@@ -83,10 +86,16 @@ func NewOracle(backend OracleBackend, params Config) *Oracle {
 		maxPrice = DefaultMaxPrice
 		log.Warn("Sanitizing invalid gasprice oracle price cap", "provided", params.MaxPrice, "updated", maxPrice)
 	}
+	minPrice := params.MinPrice
+	if minPrice == nil || minPrice.Int64() <= 0 {
+		minPrice = DefaultMinPrice
+		log.Warn("Sanitizing invalid gasprice oracle price floor", "provided", params.MinPrice, "updated", minPrice)
+	}
 	return &Oracle{
 		backend:     backend,
 		lastPrice:   params.Default,
 		maxPrice:    maxPrice,
+		minPrice:    minPrice,
 		checkBlocks: blocks,
 		percentile:  percent,
 	}
@@ -161,6 +170,11 @@ func (gpo *Oracle) SuggestPrice(ctx context.Context) (*big.Int, error) {
 	if price.Cmp(gpo.maxPrice) > 0 {
 		price = new(big.Int).Set(gpo.maxPrice)
 	}
+
+	if price.Cmp(gpo.minPrice) < 0 {
+		price = new(big.Int).Set(gpo.minPrice)
+	}
+
 	gpo.cacheLock.Lock()
 	gpo.lastHead = headHash
 	gpo.lastPrice = price

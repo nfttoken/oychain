@@ -1,6 +1,8 @@
 name: Docker Image CI
 
 on:
+  workflow_dispatch:
+
   push:
     -tags:
       - v1.2.0
@@ -39,7 +41,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }} 
           
       - name: Copy binary out of image
-        run: mkdir -p build/bin && docker create --name binContainer wyblockchain/kcc:latest && docker cp binContainer:/usr/local/bin/geth build/bin/geth && ls -la build/bin/geth
+        run: mkdir -p build/bin && docker create --name binContainer kucoincommunitychain/kcc:latest && docker cp binContainer:/usr/local/bin/geth build/bin/geth && ls -la build/bin/geth
         
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
